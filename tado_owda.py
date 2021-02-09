@@ -8,17 +8,23 @@ import time
 
 from PyTado.interface import Tado
 
+def main():
+
+    login()
+    print ("Waiting for an open window..")
+    checkWindowsState()
+
 def login():
 
     global t
     try:
-        t = Tado('your_username@mail.com', 'your_password')
+        t = Tado('your_username@mail.com', 'your_password') # tado account and password
 
     except Exception as e:
         print (e)
         if (str(e).find("ConnectionError") != -1):
             print ("Connection Error, retrying in 30 sec..")
-            time.sleep(30)
+            time.sleep(30) # retrying interval (in seconds), in case of connection error
             login()
         else:
             print ("Login error.")
@@ -36,7 +42,7 @@ def checkWindowsState():
                 print ("Done!")
                 print("Waiting for an open window..")
 
-        time.sleep(5.0)
+        time.sleep(5.0) # checking interval (in seconds)
         checkWindowsState()
 
     except KeyboardInterrupt:
@@ -48,9 +54,7 @@ def checkWindowsState():
         if (str(e).find("ConnectionError") != -1):
             print ("Connection Error, retrying in 30 sec..")
     
-            time.sleep(30)
+            time.sleep(30) # retrying interval (in seconds), in case of connection error
             checkWindowsState()
 
-login()
-print ("Waiting for an open window..")
-checkWindowsState()
+main()
