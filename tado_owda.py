@@ -1,3 +1,8 @@
+#
+# tado_owda.py (Open Window Detection Assist for Tado)
+# Created by Adrian Slabu <adrianslabu@icloud.com> on 07.02.2021
+# 
+
 import sys
 import time
 
