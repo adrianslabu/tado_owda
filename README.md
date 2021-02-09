@@ -1,4 +1,4 @@
-# tado_OpenWindowAssist
+# tado_owda (Open Window Detection Assist)
 
 My first script in python.
 It automatically switch off the heating in the room where tado TRV detects an open window.
