@@ -5,3 +5,6 @@ It automatically switch off the heating in the room where tado TRV detects an op
 
 Requires PyTado:
 pip install python-tado
+
+# If you want to support me
+[Paypal](https://paypal.me/adrianslabu)
