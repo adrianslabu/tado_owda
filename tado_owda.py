@@ -10,25 +10,46 @@ from PyTado.interface import Tado
 
 def main():
 
+    global lastMessage
+    global username
+    global password
+    global checkingInterval
+    global errorRetringInterval
+
+    lastMessage = ""
+
+    username = "your_username" # tado username
+    password = "your_password" # tado password
+
+    checkingInterval = 6.0 # checking interval (in seconds)
+    errorRetringInterval = 20.0 # retrying interval (in seconds), in case of an error
+
     login()
-    print ("Waiting for an open window..")
+    printm ("Waiting for an open window..")
     checkWindowsState()
 
 def login():
 
     global t
+
     try:
-        t = Tado('your_username@mail.com', 'your_password') # tado account and password
+        t = Tado(username, password)
+
+        if (lastMessage.find("Connection Error") != -1):
+            printm ("Connection established, everything looks good now, continuing..")
+
+    except KeyboardInterrupt:
+        printm ("Interrupted by user.")
+        sys.exit(0)
 
     except Exception as e:
-        print (e)
-        if (str(e).find("ConnectionError") != -1):
-            print ("Connection Error, retrying in 30 sec..")
-            time.sleep(30) # retrying interval (in seconds), in case of connection error
-            login()
-        else:
-            print ("Login error.")
+        if (str(e).find("access_token") != -1):
+            printm ("Login error, check the username / password !")
             sys.exit(0)
+        else:
+            printm (str(e) + "\nConnection Error, retrying in " + str(errorRetringInterval) + " sec..")
+            time.sleep(errorRetringInterval) 
+            login()
 
 def checkWindowsState():
 
@@ -37,24 +58,31 @@ def checkWindowsState():
             zoneID = z["id"]
             zoneName = z["name"]
             if (t.getOpenWindowDetected(zoneID)["openWindowDetected"] == True):
-                print (zoneName + ": open window detected, activating the OpenWindow mode.")
+                printm (zoneName + ": open window detected, activating the OpenWindow mode.")
                 t.setOpenWindow(zoneID)
-                print ("Done!")
-                print("Waiting for an open window..")
+                printm ("Done!")
+                printm ("Waiting for an open window..")
 
-        time.sleep(5.0) # checking interval (in seconds)
+        if (lastMessage.find("Connection Error") != -1):
+            printm ("Connection established, everything looks good now, continuing..")
+            printm ("Waiting for an open window..")
+
+        time.sleep(checkingInterval)
         checkWindowsState()
 
     except KeyboardInterrupt:
-        print ("Interrupted by user.")
+        printm ("Interrupted by user.")
         sys.exit(0)
 
     except Exception as e:
-        print(e)
-        if (str(e).find("ConnectionError") != -1):
-            print ("Connection Error, retrying in 30 sec..")
-    
-            time.sleep(30) # retrying interval (in seconds), in case of connection error
-            checkWindowsState()
+        printm (str(e) + "\nConnection Error, retrying in " + str(errorRetringInterval) + " sec..")
+        time.sleep(errorRetringInterval)
+        checkWindowsState()
+
+def printm(message):
+    global lastMessage
+    if (message != lastMessage):
+        lastMessage = (message)
+        sys.stdout.write(message + "\n")
 
 main()
