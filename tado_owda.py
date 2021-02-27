@@ -21,8 +21,8 @@ def main():
     username = "your_username" # tado username
     password = "your_password" # tado password
 
-    checkingInterval = 6.0 # checking interval (in seconds)
-    errorRetringInterval = 20.0 # retrying interval (in seconds), in case of an error
+    checkingInterval = 10.0 # checking interval (in seconds)
+    errorRetringInterval = 30.0 # retrying interval (in seconds), in case of an error
 
     login()
     printm ("Waiting for an open window..")
@@ -52,32 +52,33 @@ def login():
             login()
 
 def checkWindowsState():
+    i = 0
+    while i < 3: # My solution to fix the "stack depth"
+        try:
+            for z in t.getZones():
+                zoneID = z["id"]
+                zoneName = z["name"]
+                if (t.getOpenWindowDetected(zoneID)["openWindowDetected"] == True):
+                    printm (zoneName + ": open window detected, activating the OpenWindow mode.")
+                    t.setOpenWindow(zoneID)
+                    printm ("Done!")
+                    printm ("Waiting for an open window..")
 
-    try:
-        for z in t.getZones():
-            zoneID = z["id"]
-            zoneName = z["name"]
-            if (t.getOpenWindowDetected(zoneID)["openWindowDetected"] == True):
-                printm (zoneName + ": open window detected, activating the OpenWindow mode.")
-                t.setOpenWindow(zoneID)
-                printm ("Done!")
+            if (lastMessage.find("Connection Error") != -1):
+                printm ("Connection established, everything looks good now, continuing..")
                 printm ("Waiting for an open window..")
 
-        if (lastMessage.find("Connection Error") != -1):
-            printm ("Connection established, everything looks good now, continuing..")
-            printm ("Waiting for an open window..")
+            time.sleep(checkingInterval)
+            checkWindowsState()
 
-        time.sleep(checkingInterval)
-        checkWindowsState()
+        except KeyboardInterrupt:
+            printm ("Interrupted by user.")
+            sys.exit(0)
 
-    except KeyboardInterrupt:
-        printm ("Interrupted by user.")
-        sys.exit(0)
-
-    except Exception as e:
-        printm (str(e) + "\nConnection Error, retrying in " + str(errorRetringInterval) + " sec..")
-        time.sleep(errorRetringInterval)
-        checkWindowsState()
+        except Exception as e:
+            printm (str(e) + "\nConnection Error, retrying in " + str(errorRetringInterval) + " sec..")
+            time.sleep(errorRetringInterval)
+            checkWindowsState()
 
 def printm(message):
     global lastMessage
