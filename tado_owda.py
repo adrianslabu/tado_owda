@@ -83,7 +83,7 @@ def checkWindowsState():
 def printm(message):
     global lastMessage
     if (message != lastMessage):
-        lastMessage = (message)
+        lastMessage = message
         sys.stdout.write(message + "\n")
 
 main()
